@@ -25,10 +25,10 @@ use **--help** for usage help
 
 > **python3 cipher-tools.py -rf -e hello-this-is-cipher-tools 5**
 
-this command will encrypt the phrase *hello-this-is-cipher-tools* with the railfence cipher using a rail number of 5  
+this command will encrypt the phrase *hello-this-is-cipher-tools* with the railfence cipher using a rail number of 5, producing *hsreiietlhsholtcposoil*  
 
 > **python3 cipher-tools.py -c -d yvccf-kyzj-zj-tzgyvi-kffcj 9**  
 
-this command will decrypt the phrase *yvccf-kyzj-zj-tzgyvi-kffcj* using caesar cipher and a shift of 9, producting *hello-this-is-cipher-tools*
+this command will decrypt the phrase *yvccf-kyzj-zj-tzgyvi-kffcj* using caesar cipher and a shift of 9, producing *hello-this-is-cipher-tools*
 
 
