@@ -63,6 +63,51 @@ def railfence_encrypt(plain_text, rails):
     return output
 
 
+def railfence_decrypt(cipher_text, rails):
+    output = ''
+    grid = [['-'] * len(cipher_text) for i in range(rails)]
+
+    x, y, count, empty_count = 0, 0, 0, 0
+    finished = False
+
+    # set all diagonal spaces = &
+    while not finished:
+        while x < rails and empty_count < len(cipher_text):
+            grid[x][y] = '&'
+            y, x, empty_count = y + 1, x + 1, empty_count + 1
+        x = x - 2
+        while x > -1 and empty_count < len(cipher_text):
+            grid[x][y] = '&'
+            y, x, empty_count = y+1, x-1, empty_count + 1
+        x = 1
+        if empty_count == len(cipher_text):
+            finished = True
+
+    for i in range(0, rails):
+        for j in range(0, len(cipher_text)):
+            if grid[i][j] == '&':
+                grid[i][j], count = cipher_text[count], count + 1
+
+    # have grid with cipher filled
+
+    # grid -> output
+    x, y, finished = 0, 0, False
+
+    while not finished:
+        while x < rails and len(output) != len(cipher_text):
+            output += grid[x][y]
+            y, x = y + 1, x + 1
+        x = x - 2
+        while x > -1 and len(output) != len(cipher_text):
+            output += grid[x][y]
+            y, x = y+1, x-1
+        x = 1
+        if len(output) == len(cipher_text):
+            finished = True
+
+    return output
+
+
 def caesar_encrypt(plain_text, shift):
     output = ''
     for c in plain_text:
@@ -83,6 +128,11 @@ def caesar_decrypt(cipher_text, shift):
     return output
 
 
+def print_grid(grid):
+    for row in grid:
+        print(row)
+
+
 args = get_args()
 
 if args[0] == '-c':
@@ -93,3 +143,5 @@ if args[0] == '-c':
 elif args[0] == '-rf':
     if args[1] == '-e':
         print(railfence_encrypt(args[2], args[3]))
+    else:
+        print(railfence_decrypt(args[2], args[3]))
