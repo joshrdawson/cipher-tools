@@ -12,8 +12,7 @@ def get_args():
         if args[0] in CIPHERS:
             if args[1] in CHOICE:
                 if args[3].isnumeric():
-                    args[3] = int(args[3])
-                    args[2] = args[2].lower()
+                    args[3], args[2] = int(args[3]), args[2].lower()
                     return args
                 else:
                     print('invalid arguments: python3 cipher.py %s %s %s [%s]' % (args[0], args[1], args[2], args[3]))
@@ -32,25 +31,23 @@ def get_args():
 
 
 def railfence_encrypt(plain_text, rails):
-    output = ''
-    fm_text = ''  # remove any -'s
+    output, fm_text = '', ''
+    # remove any -'s
     for c in plain_text:
         if c != '-':
             fm_text += c
+
     grid = [['-'] * len(fm_text) for i in range(rails)]
 
     # shifting output -> grid
-    x, y, count = 0, 0, 0
-    finished = False
+    x, y, count, finished = 0, 0, 0, False
 
     while not finished:
         while x < rails and count < len(fm_text):
-            grid[x][y] = fm_text[count]
-            y, x, count = y + 1, x + 1, count + 1
+            grid[x][y], y, x, count = fm_text[count], y + 1, x + 1, count + 1
         x = x - 2
         while x > -1 and count < len(fm_text):
-            grid[x][y] = fm_text[count]
-            y, x, count = y+1, x-1, count + 1
+            grid[x][y], y, x, count = fm_text[count], y+1, x-1, count + 1
         x = 1
         if count == len(fm_text):
             finished = True
@@ -67,18 +64,15 @@ def railfence_decrypt(cipher_text, rails):
     output = ''
     grid = [['-'] * len(cipher_text) for i in range(rails)]
 
-    x, y, count, empty_count = 0, 0, 0, 0
-    finished = False
+    x, y, count, empty_count, finished = 0, 0, 0, 0, False
 
     # set all diagonal spaces = &
     while not finished:
         while x < rails and empty_count < len(cipher_text):
-            grid[x][y] = '&'
-            y, x, empty_count = y + 1, x + 1, empty_count + 1
+            grid[x][y], y, x, empty_count = '&', y + 1, x + 1, empty_count + 1
         x = x - 2
         while x > -1 and empty_count < len(cipher_text):
-            grid[x][y] = '&'
-            y, x, empty_count = y+1, x-1, empty_count + 1
+            grid[x][y], y, x, empty_count = '&', y+1, x-1, empty_count + 1
         x = 1
         if empty_count == len(cipher_text):
             finished = True
@@ -95,12 +89,10 @@ def railfence_decrypt(cipher_text, rails):
 
     while not finished:
         while x < rails and len(output) != len(cipher_text):
-            output += grid[x][y]
-            y, x = y + 1, x + 1
+            output, y, x = output + grid[x][y], y + 1, x + 1
         x = x - 2
         while x > -1 and len(output) != len(cipher_text):
-            output += grid[x][y]
-            y, x = y+1, x-1
+            output, y, x = output + grid[x][y], y+1, x-1
         x = 1
         if len(output) == len(cipher_text):
             finished = True
