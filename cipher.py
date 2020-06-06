@@ -24,7 +24,7 @@ def get_args():
     # check if --help (or 1 arg)
     elif len(sys.argv) == 2:
         print(
-            'Usage:\n\t(use - as space in text)\n\nrailfence cipher:\n\t\tpython3 cipher.py -rf -e [plaintext] [rails]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -rf -d [ciphertext] [rails]\t(to decrupt)\n\ncaesar cipher:\n\t\tpython3 cipher.py -c -e [plaintext] [shift]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -c -d [ciphertext] [shift]\t(to decrypt)\n\n')
+            'Usage:\n\t(use - as space in text)\n\nrailfence cipher:\n\t\tpython3 cipher.py -rf -e [plaintext] [rails]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -rf -d [ciphertext] [rails]\t(to decrypt)\n\ncaesar cipher:\n\t\tpython3 cipher.py -c -e [plaintext] [shift]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -c -d [ciphertext] [shift]\t(to decrypt)\n\n')
     # anything else
     else:
         print('invalid arguments, use --help')
