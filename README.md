@@ -17,7 +17,7 @@ use the script using the following command **python3 cipher-tools.py [cipher] [m
 
 ## [mode]
 **-e**: encryption  
-**-d**: decryption
+**-d**: decryption  
 **-c**: cracking (try to crack ciphertext using all availible ciphers)
 
 use **--help** for usage help  
