@@ -1,6 +1,8 @@
 import sys
+import json
+import math
 
-CIPHERS = ['-c', '-rf']
+CIPHERS = ['-ca', '-rf']
 CHOICE = ['-e', '-d']
 
 
@@ -20,10 +22,13 @@ def get_args():
                 print('invalid arguments: python3 cipher.py %s [%s] %s %s' % (args[0], args[1], args[2], args[3]))
         else:
             print('invalid arguments: python3 cipher.py [%s] %s %s %s' % (args[0], args[1], args[2], args[3]))
-    # check if --help (or 1 arg)
-    elif len(sys.argv) == 2:
+    # cracking args
+    elif len(sys.argv) == 3 or len(sys.argv) == 4 and sys.argv[1] == '-c':
+        return sys.argv[1:]
+    # check if --help
+    elif len(sys.argv) == 2 and sys.argv[1] == '--help':
         print(
-            'Usage:\n\t(use - as space in text)\n\nrailfence cipher:\n\t\tpython3 cipher.py -rf -e [plaintext] [rails]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -rf -d [ciphertext] [rails]\t(to decrypt)\n\ncaesar cipher:\n\t\tpython3 cipher.py -c -e [plaintext] [shift]\t(to encrypt)\n\tor\n\t\tpython3 cipher.py -c -d [ciphertext] [shift]\t(to decrypt)\n\n')
+            'Usage:\n\t(use - as space in text)\n\ncipher cracking:\n\t\tpython3 cipher-tools.py -c [ciphertext] [accuracy]\t(crack ciphertext with accuracy number of matches)\n\tor\n\t\tpython3 cipher-tools.py -c [ciphertext]\t\t\t(crack with default accuracy of 5)\n\nrailfence cipher:\n\t\tpython3 cipher-tools.py -rf -e [plaintext] [rails]\t(to encrypt)\n\tor\n\t\tpython3 cipher-tools.py -rf -d [ciphertext] [rails]\t(to decrypt)\n\ncaesar cipher:\n\t\tpython3 cipher-tools.py -ca -e [plaintext] [shift]\t(to encrypt)\n\tor\n\t\tpython3 cipher-tools.py -ca -d [ciphertext] [shift]\t(to decrypt)\n\n')
     # anything else
     else:
         print('invalid arguments, use --help')
@@ -63,6 +68,13 @@ def railfence_encrypt(plain_text, rails):
 def railfence_decrypt(cipher_text, rails):
     output = ''
     grid = [['-'] * len(cipher_text) for i in range(rails)]
+    temp = ''
+
+    for c in cipher_text:
+        if c != '-':
+            temp += c
+
+    cipher_text = temp
 
     x, y, count, empty_count, finished = 0, 0, 0, 0, False
 
@@ -103,31 +115,47 @@ def railfence_decrypt(cipher_text, rails):
 def caesar_encrypt(plain_text, shift):
     output = ''
     for c in plain_text:
-        if c == '-':
-            output += c
-        else:
-            output += chr(int(((ord(c) - 97) - shift) % 26) + 97)
+        output += c if c == '-' else chr(int(((ord(c) - 97) - shift) % 26) + 97)
     return output
 
 
 def caesar_decrypt(cipher_text, shift):
     output = ''
     for c in cipher_text:
-        if c == '-':
-            output += c
-        else:
-            output += chr(int(((ord(c) - 97) + shift) % 26) + 97)
+        output += c if c == '-' else chr(int(((ord(c) - 97) + shift) % 26) + 97)
     return output
 
 
-def print_grid(grid):
-    for row in grid:
-        print(row)
+def brute_crack(cipher_text, accuracy):
+    words = json.loads(open('words.json').read())
+    possible_plaintext = []
+
+    # ceasar brute
+    for step in range(1, 27):
+        output = caesar_decrypt(cipher_text, step)
+        tally = 0
+        for word in words:
+            if word in output:
+                tally += 1
+        if tally >= accuracy:
+            possible_plaintext.append('#%d CAESAR: \"%s\" with step %d' % (len(possible_plaintext) + 1, output, step))
+
+    # railfence brute
+    for rail in range(3, math.floor(len(cipher_text) / 2)):
+        output = railfence_decrypt(cipher_text, rail)
+        tally = 0
+        for word in words:
+            if word in output:
+                tally += 1
+        if tally >= accuracy + 1:
+            possible_plaintext.append('#%d RAILFENCE: \"%s\" with rail number %d' % (len(possible_plaintext) + 1, output, rail))
+
+    return possible_plaintext
 
 
 args = get_args()
 
-if args[0] == '-c':
+if args[0] == '-ca':
     if args[1] == '-e':
         print(caesar_encrypt(args[2], args[3]))
     else:
@@ -137,3 +165,14 @@ elif args[0] == '-rf':
         print(railfence_encrypt(args[2], args[3]))
     else:
         print(railfence_decrypt(args[2], args[3]))
+elif args[0] == '-c':
+    if len(args) == 2:  # if no accuracy given, use 5
+        pos = brute_crack(args[1], 5)
+    else:
+        pos = brute_crack(args[1], int(args[2]))
+    if len(pos) == 0:
+        print('no matches found\ntry a lower accuracy')
+    else:
+        print('POSSIBLE SOLUTIONS')
+        for solution in pos:
+            print(solution)
