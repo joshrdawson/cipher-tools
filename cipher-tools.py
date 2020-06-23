@@ -36,25 +36,31 @@ def get_args():
 
 
 def railfence_encrypt(plain_text, rails):
-    output, fm_text = '', ''
+    output, temp = '',  ''
+
     # remove any -'s
     for c in plain_text:
         if c != '-':
-            fm_text += c
+            temp += c
 
-    grid = [['-'] * len(fm_text) for i in range(rails)]
+    plain_text = temp
+    del temp
 
-    # shifting output -> grid
+    grid = [['-'] * len(plain_text) for i in range(rails)]
     x, y, count, finished = 0, 0, 0, False
 
     while not finished:
-        while x < rails and count < len(fm_text):
-            grid[x][y], y, x, count = fm_text[count], y + 1, x + 1, count + 1
+        while x < rails and count < len(plain_text):
+            grid[x][y] = plain_text[count]
+            x, y = x + 1, y + 1
+            count += 1
         x = x - 2
-        while x > -1 and count < len(fm_text):
-            grid[x][y], y, x, count = fm_text[count], y+1, x-1, count + 1
+        while x > -1 and count < len(plain_text):
+            grid[x][y] = plain_text[count]
+            x, y = x - 1, y + 1
+            count += 1
         x = 1
-        if count == len(fm_text):
+        if count == len(plain_text):
             finished = True
 
     # formatting grid -> output
@@ -66,25 +72,29 @@ def railfence_encrypt(plain_text, rails):
 
 
 def railfence_decrypt(cipher_text, rails):
-    output = ''
-    grid = [['-'] * len(cipher_text) for i in range(rails)]
-    temp = ''
+    output, temp = '', ''
 
     for c in cipher_text:
         if c != '-':
             temp += c
 
     cipher_text = temp
+    del temp
 
+    grid = [['-'] * len(cipher_text) for i in range(rails)]
     x, y, count, empty_count, finished = 0, 0, 0, 0, False
 
     # set all diagonal spaces = &
     while not finished:
         while x < rails and empty_count < len(cipher_text):
-            grid[x][y], y, x, empty_count = '&', y + 1, x + 1, empty_count + 1
+            grid[x][y] = '&'
+            x, y = x + 1, y + 1
+            empty_count += 1
         x = x - 2
         while x > -1 and empty_count < len(cipher_text):
-            grid[x][y], y, x, empty_count = '&', y+1, x-1, empty_count + 1
+            grid[x][y] = '&'
+            x, y = x - 1, y + 1
+            empty_count += 1
         x = 1
         if empty_count == len(cipher_text):
             finished = True
@@ -92,7 +102,8 @@ def railfence_decrypt(cipher_text, rails):
     for i in range(0, rails):
         for j in range(0, len(cipher_text)):
             if grid[i][j] == '&':
-                grid[i][j], count = cipher_text[count], count + 1
+                grid[i][j] = cipher_text[count]
+                count = count + 1
 
     # have grid with cipher filled
 
@@ -101,10 +112,12 @@ def railfence_decrypt(cipher_text, rails):
 
     while not finished:
         while x < rails and len(output) != len(cipher_text):
-            output, y, x = output + grid[x][y], y + 1, x + 1
+            output += grid[x][y]
+            x, y = x + 1, y + 1
         x = x - 2
         while x > -1 and len(output) != len(cipher_text):
-            output, y, x = output + grid[x][y], y+1, x-1
+            output += grid[x][y]
+            x, y = x - 1, y + 1
         x = 1
         if len(output) == len(cipher_text):
             finished = True
@@ -129,6 +142,7 @@ def caesar_decrypt(cipher_text, shift):
 def brute_crack(cipher_text, accuracy):
     words = json.loads(open('words.json').read())
     possible_plaintext = []
+    temp = ''
 
     # ceasar brute
     for step in range(1, 27):
