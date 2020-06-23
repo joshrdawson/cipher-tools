@@ -34,6 +34,6 @@ this command will decrypt the phrase *yvccf-kyzj-zj-tzgyvi-kffcj* using caesar c
 
 > **python3 cipher-tools.py -c hsreiietlhsholtcposoil 5**
 
-this command will try to crack the message *hsreiietlhsholtcposoil* using all availible ciphers and an accuracy of 5 (must contain 5 words to be considered a potential solution). this produces 2 possible solutions. One of which is *hellothisisciphertools*
+this command will try to crack the message *hsreiietlhsholtcposoil* using all availible ciphers and an accuracy of 5 (must contain 5 words to be considered a potential solution). this produces 2 possible solutions. one of which is *hellothisisciphertools*
 
 
